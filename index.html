@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PressureWashCRM — South LA Pressure Washing</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f3f6fa;color:#17202a}
+header{background:#17365d;color:white;padding:18px 20px;position:sticky;top:0;z-index:2}
+header h1{margin:0;font-size:23px}header p{margin:4px 0 0;opacity:.85}
+nav{display:flex;gap:8px;overflow:auto;background:white;padding:10px;border-bottom:1px solid #ddd;position:sticky;top:79px;z-index:2}
+nav button{border:0;background:#e8eef5;padding:10px 14px;border-radius:8px;white-space:nowrap;font-weight:bold}
+nav button.active{background:#2f75b5;color:white}
+main{max-width:1100px;margin:auto;padding:18px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.card{background:white;border-radius:12px;padding:16px;box-shadow:0 1px 5px #0001}.metric{font-size:27px;font-weight:bold;margin-top:8px}
+h2{margin-top:4px}.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:180px}
+input,select,textarea{width:100%;padding:11px;border:1px solid #ccd3da;border-radius:7px;font-size:15px;margin:5px 0 12px}
+button.primary{background:#2f75b5;color:white;border:0;padding:11px 15px;border-radius:7px;font-weight:bold}
+button.danger{background:#c0392b;color:white;border:0;padding:8px 11px;border-radius:7px}
+table{width:100%;border-collapse:collapse;background:white;margin-top:12px}
+th,td{padding:10px;border-bottom:1px solid #e1e5e9;text-align:left}th{background:#eef3f8}
+.hidden{display:none}.pill{padding:4px 8px;border-radius:12px;background:#e8eef5;font-size:12px}
+@media(max-width:600px){main{padding:12px}table{font-size:13px}.hide-mobile{display:none}}
+</style>
+</head>
+<body>
+<header><h1>PressureWashCRM</h1><p>South LA Pressure Washing • 2-Person Team</p></header>
+<nav id="nav">
+<button onclick="show('dashboard',this)" class="active">Dashboard</button>
+<button onclick="show('customers',this)">Customers</button>
+<button onclick="show('leads',this)">Leads</button>
+<button onclick="show('jobs',this)">Jobs</button>
+<button onclick="show('expenses',this)">Expenses</button>
+</nav>
+<main>
+<section id="dashboard">
+<h2>Dashboard</h2>
+<div class="grid">
+<div class="card">Customers<div class="metric" id="mCustomers">0</div></div>
+<div class="card">Jobs<div class="metric" id="mJobs">0</div></div>
+<div class="card">Completed<div class="metric" id="mCompleted">0</div></div>
+<div class="card">Collected<div class="metric" id="mCollected">$0</div></div>
+<div class="card">Outstanding<div class="metric" id="mOutstanding">$0</div></div>
+<div class="card">Expenses<div class="metric" id="mExpenses">$0</div></div>
+</div>
+<div class="card" style="margin-top:15px"><h3>Team</h3><div class="row"><input id="person1" value="Team Member 1" onchange="saveTeam()"><input id="person2" value="Team Member 2" onchange="saveTeam()"></div></div>
+</section>
+
+<section id="customers" class="hidden">
+<div class="card"><h2>Add Customer</h2><div class="row">
+<div><label>Name</label><input id="cName"></div><div><label>Phone</label><input id="cPhone"></div>
+</div><div class="row"><div><label>Email</label><input id="cEmail"></div><div><label>Address</label><input id="cAddress"></div></div>
+<label>Notes</label><textarea id="cNotes"></textarea><button class="primary" onclick="addCustomer()">Add Customer</button></div>
+<div class="card" style="margin-top:15px"><h2>Customers</h2><div id="customerTable"></div></div>
+</section>
+
+<section id="leads" class="hidden">
+<div class="card"><h2>Add Lead</h2><div class="row"><div><label>Name</label><input id="lName"></div><div><label>Phone</label><input id="lPhone"></div></div>
+<div class="row"><div><label>Address</label><input id="lAddress"></div><div><label>Service</label><input id="lService" placeholder="Driveway, house wash..."></div></div>
+<div class="row"><div><label>Estimated Price</label><input id="lPrice" type="number"></div><div><label>Assigned To</label><select id="lAssigned"></select></div></div>
+<button class="primary" onclick="addLead()">Add Lead</button></div>
+<div class="card" style="margin-top:15px"><h2>Leads</h2><div id="leadTable"></div></div>
+</section>
+
+<section id="jobs" class="hidden">
+<div class="card"><h2>Add Job</h2><div class="row"><div><label>Customer</label><select id="jCustomer"></select></div><div><label>Service</label><input id="jService"></div></div>
+<div class="row"><div><label>Date</label><input id="jDate" type="date"></div><div><label>Price</label><input id="jPrice" type="number"></div></div>
+<div class="row"><div><label>Status</label><select id="jStatus"><option>Quoted</option><option>Scheduled</option><option>In Progress</option><option>Completed</option><option>Cancelled</option></select></div>
+<div><label>Payment</label><select id="jPayment"><option>Unpaid</option><option>Paid</option><option>Partial</option></select></div>
+<div><label>Assigned To</label><select id="jAssigned"></select></div></div>
+<label>Notes</label><textarea id="jNotes"></textarea><button class="primary" onclick="addJob()">Add Job</button></div>
+<div class="card" style="margin-top:15px"><h2>Jobs</h2><div id="jobTable"></div></div>
+</section>
+
+<section id="expenses" class="hidden">
+<div class="card"><h2>Add Expense</h2><div class="row"><div><label>Date</label><input id="eDate" type="date"></div><div><label>Category</label><input id="eCategory" placeholder="Gas, chemicals, equipment..."></div></div>
+<div class="row"><div><label>Description</label><input id="eDesc"></div><div><label>Amount</label><input id="eAmount" type="number"></div></div>
+<div><label>Paid By</label><select id="ePaid"></select></div><button class="primary" onclick="addExpense()">Add Expense</button></div>
+<div class="card" style="margin-top:15px"><h2>Expenses</h2><div id="expenseTable"></div></div>
+</section>
+</main>
+<script>
+const key="pressurewashcrm_v1";
+let db=JSON.parse(localStorage.getItem(key)||'{"customers":[],"leads":[],"jobs":[],"expenses":[],"team":["Team Member 1","Team Member 2"]}');
+function save(){localStorage.setItem(key,JSON.stringify(db));render()}
+function id(prefix){return prefix+"-"+Date.now().toString(36).toUpperCase()}
+function esc(x){return String(x??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function money(n){return "$"+Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}
+function show(id,btn){document.querySelectorAll("main section").forEach(x=>x.classList.add("hidden"));document.getElementById(id).classList.remove("hidden");document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));btn.classList.add("active")}
+function saveTeam(){db.team=[document.getElementById("person1").value||"Team Member 1",document.getElementById("person2").value||"Team Member 2"];save()}
+function teamOptions(){return db.team.map(x=>`<option>${esc(x)}</option>`).join("")}
+function addCustomer(){let x={id:id("C"),name:cName.value,phone:cPhone.value,email:cEmail.value,address:cAddress.value,notes:cNotes.value};if(!x.name)return alert("Enter a customer name.");db.customers.push(x);["cName","cPhone","cEmail","cAddress","cNotes"].forEach(i=>document.getElementById(i).value="");save()}
+function addLead(){let x={id:id("L"),name:lName.value,phone:lPhone.value,address:lAddress.value,service:lService.value,price:Number(lPrice.value||0),assigned:lAssigned.value,status:"New"};if(!x.name)return alert("Enter a lead name.");db.leads.push(x);["lName","lPhone","lAddress","lService","lPrice"].forEach(i=>document.getElementById(i).value="");save()}
+function addJob(){let x={id:id("J"),customer:jCustomer.value,service:jService.value,date:jDate.value,price:Number(jPrice.value||0),status:jStatus.value,payment:jPayment.value,assigned:jAssigned.value,notes:jNotes.value};if(!x.customer)return alert("Select a customer.");db.jobs.push(x);["jService","jDate","jPrice","jNotes"].forEach(i=>document.getElementById(i).value="");save()}
+function addExpense(){let x={id:id("E"),date:eDate.value,category:eCategory.value,desc:eDesc.value,amount:Number(eAmount.value||0),paid:ePaid.value};db.expenses.push(x);["eDate","eCategory","eDesc","eAmount"].forEach(i=>document.getElementById(i).value="");save()}
+function del(type,i){if(confirm("Delete this item?")){db[type].splice(i,1);save()}}
+function render(){
+document.getElementById("person1").value=db.team[0];document.getElementById("person2").value=db.team[1];
+["lAssigned","jAssigned","ePaid"].forEach(id=>document.getElementById(id).innerHTML=teamOptions());
+document.getElementById("jCustomer").innerHTML=db.customers.map(x=>`<option>${esc(x.name)}</option>`).join("");
+mCustomers.textContent=db.customers.length;mJobs.textContent=db.jobs.length;mCompleted.textContent=db.jobs.filter(x=>x.status==="Completed").length;
+mCollected.textContent=money(db.jobs.filter(x=>x.payment==="Paid").reduce((a,x)=>a+x.price,0));
+mOutstanding.textContent=money(db.jobs.filter(x=>x.payment==="Unpaid").reduce((a,x)=>a+x.price,0));
+mExpenses.textContent=money(db.expenses.reduce((a,x)=>a+x.amount,0));
+customerTable.innerHTML="<table><tr><th>Name</th><th>Phone</th><th>Address</th><th>Assigned</th><th></th></tr>"+db.customers.map((x,i)=>`<tr><td>${esc(x.name)}</td><td>${esc(x.phone)}</td><td>${esc(x.address)}</td><td>—</td><td><button class=danger onclick="del('customers',${i})">Delete</button></td></tr>`).join("")+"</table>";
+leadTable.innerHTML="<table><tr><th>Name</th><th>Service</th><th>Est.</th><th>Status</th><th>Assigned</th><th></th></tr>"+db.leads.map((x,i)=>`<tr><td>${esc(x.name)}</td><td>${esc(x.service)}</td><td>${money(x.price)}</td><td><span class=pill>${esc(x.status)}</span></td><td>${esc(x.assigned)}</td><td><button class=danger onclick="del('leads',${i})">Delete</button></td></tr>`).join("")+"</table>";
+jobTable.innerHTML="<table><tr><th>Customer</th><th>Service</th><th>Date</th><th>Price</th><th>Status</th><th>Payment</th><th>Assigned</th><th></th></tr>"+db.jobs.map((x,i)=>`<tr><td>${esc(x.customer)}</td><td>${esc(x.service)}</td><td>${esc(x.date)}</td><td>${money(x.price)}</td><td>${esc(x.status)}</td><td>${esc(x.payment)}</td><td>${esc(x.assigned)}</td><td><button class=danger onclick="del('jobs',${i})">Delete</button></td></tr>`).join("")+"</table>";
+expenseTable.innerHTML="<table><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th><th>Paid By</th><th></th></tr>"+db.expenses.map((x,i)=>`<tr><td>${esc(x.date)}</td><td>${esc(x.category)}</td><td>${esc(x.desc)}</td><td>${money(x.amount)}</td><td>${esc(x.paid)}</td><td><button class=danger onclick="del('expenses',${i})">Delete</button></td></tr>`).join("")+"</table>";
+}
+render();
+</script>
+</body></html>
